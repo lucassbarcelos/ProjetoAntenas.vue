@@ -35,6 +35,6 @@ export default {
   },
   getProjects: async () => {
     const result = await HTTPClient.get('/projetos')
-    return result
+    return result.data
   }
 }

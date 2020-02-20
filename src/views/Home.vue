@@ -17,12 +17,7 @@ export default {
     return {}
   },
   computed: {},
-  async mounted() {
-    try {
-    } catch (error) {
-    } finally {
-    }
-  },
+  async mounted() {},
   methods: {
     ...mapActions(['setToast', 'setLoading', 'resetLoading'])
   }
