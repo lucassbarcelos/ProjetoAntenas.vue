@@ -1,86 +1,65 @@
 <template>
   <div class="back ma-12 pa-12">
     <v-app id="inspire">
-      <template>
-        <v-navigation-drawer permanent expand-on-hover color="white" absolute>
-          <v-list>
-            <v-list-item class="mx-2">
-              <v-list-item-avatar>
-                <v-img :src="require(`./images/${avatar}`)"></v-img>
-              </v-list-item-avatar>
-            </v-list-item>
-
-            <v-list-item link>
-              <v-list-item-content>
-                <v-list-item-title class="title">{{ user.name }}</v-list-item-title>
-                <v-list-item-subtitle>{{ user.email }}</v-list-item-subtitle>
-              </v-list-item-content>
-            </v-list-item>
-          </v-list>
-
-          <v-divider></v-divider>
-
-          <v-list nav dense>
-            <v-list-item link>
-              <v-list-item-icon>
-                <v-icon>mdi-folder</v-icon>
-              </v-list-item-icon>
-              <v-list-item-title @click="goHome()">Meus Projetos</v-list-item-title>
-            </v-list-item>
-            <v-list-item link>
-              <v-list-item-icon>
-                <v-icon>mdi-account-multiple</v-icon>
-              </v-list-item-icon>
-              <v-list-item-title>Meu Perfil</v-list-item-title>
-            </v-list-item>
-            <v-list-item link>
-              <v-list-item-icon>
-                <v-icon>add</v-icon>
-              </v-list-item-icon>
-              <v-list-item-title>Novo Projeto</v-list-item-title>
-            </v-list-item>
-          </v-list>
-        </v-navigation-drawer>
-      </template>
-      <v-card v-if="cadastro" class="mx-auto my-12" width="450px">
+      <v-card v-if="cadastro && login" class="mx-auto my-12" width="450px">
         <v-card-title class="center font-xxl">Projeto Antenas</v-card-title>
         <v-divider class="py-2"></v-divider>
         <v-card-subtitle>Cadastro</v-card-subtitle>
-        <v-row align="center" class="mx-0 px-5">
-          <v-text-field label="Nome" class="mr-2" outlined></v-text-field>
-        </v-row>
-        <v-row align="center" class="mx-0 px-5">
-          <v-text-field label="Email" class="mr-2" outlined></v-text-field>
-        </v-row>
-        <v-row align="center" class="mx-0 px-5">
-          <v-text-field label="Empresa/Cargo" outlined></v-text-field>
-        </v-row>
-        <v-row align="center" class="mx-0 px-5">
-          <v-text-field label="Cpf" outlined></v-text-field>
-        </v-row>
-        <v-row align="center" class="mx-0 px-5">
-          <v-text-field label="Senha" class="mr-2" outlined></v-text-field>
-        </v-row>
+        <v-form ref="formCadastro" lazy-validation>
+          <v-row align="center" class="mx-0 px-5">
+            <v-text-field v-model="usuario.name" :rules="rules.name" label="Nome" class="mr-2" outlined></v-text-field>
+          </v-row>
+          <v-row align="center" class="mx-0 px-5">
+            <v-text-field
+              v-model="usuario.email"
+              :rules="rules.email"
+              label="Email"
+              class="mr-2"
+              outlined
+            ></v-text-field>
+          </v-row>
+          <v-row align="center" class="mx-0 px-5">
+            <v-text-field
+              v-if="chipvalue == '1'"
+              v-model="usuario.empresa"
+              label="Empresa/Cargo"
+              outlined
+            ></v-text-field>
+          </v-row>
+          <v-row align="center" class="mx-0 px-5">
+            <v-text-field v-if="chipvalue == '1'" v-model="usuario.cpf" label="Cpf" outlined></v-text-field>
+          </v-row>
+          <v-row align="center" class="mx-0 px-5">
+            <v-text-field
+              v-model="usuario.senha"
+              :rules="rules.name"
+              type="password"
+              label="Senha"
+              class="mr-2"
+              outlined
+            ></v-text-field>
+          </v-row>
 
-        <v-card-text>
-          <v-chip-group active-class="primary white--text" column>
-            <v-chip>Empresario</v-chip>
+          <v-card-text>
+            <v-chip-group v-model="chipvalue" active-class="primary white--text" column>
+              <v-chip value="1">Empresario</v-chip>
 
-            <v-chip>Cadi</v-chip>
+              <v-chip value="2">Cadi</v-chip>
 
-            <v-chip>Aluno</v-chip>
+              <v-chip value="3">Aluno</v-chip>
 
-            <v-chip>Professor</v-chip>
-          </v-chip-group>
-        </v-card-text>
+              <v-chip value="4">Professor</v-chip>
+            </v-chip-group>
+          </v-card-text>
 
-        <v-card-actions>
-          <v-btn class="mb-2" color="primary">Cadastrar</v-btn>
-          <v-spacer></v-spacer>
-          <v-btn class="mb-2" @click="toggleCadastro" color="primary" outlined>Login</v-btn>
-        </v-card-actions>
+          <v-card-actions>
+            <v-btn class="mb-2" color="primary" @click="cadastrar">Cadastrar</v-btn>
+            <v-spacer></v-spacer>
+            <v-btn color="primary" outlined class="mb-2" @click="toggleCadastro">Login</v-btn>
+          </v-card-actions>
+        </v-form>
       </v-card>
-      <v-card v-if="!cadastro" class="mx-auto my-12" width="450px">
+      <v-card v-if="!cadastro && login" class="mx-auto my-12" width="450px">
         <v-card-title class="center font-xxl">Projeto Antenas</v-card-title>
         <v-divider class="py-2"></v-divider>
         <v-card-subtitle>Login</v-card-subtitle>
@@ -93,18 +72,14 @@
         </v-row>
 
         <v-card-actions>
-          <v-btn class="mb-2" color="primary">Entrar</v-btn>
+          <v-btn class="mb-2" color="primary" @click="goHome()">Entrar</v-btn>
           <v-spacer></v-spacer>
-          <v-btn class="mb-2" @click="toggleCadastro" color="primary" outlined>Cadastre-se</v-btn>
+          <v-btn class="mb-2" color="primary" outlined @click="toggleCadastro">Cadastre-se</v-btn>
         </v-card-actions>
       </v-card>
+      <router-view></router-view>
       <s-loading v-if="loading.show" :show="loading.show" :message="loading.message" />
-      <s-toast
-        v-model="showToast"
-        :color="toast.color"
-        :message="toast.message"
-        :time="toast.time"
-      />
+      <s-toast v-model="showToast" :color="toast.color" :message="toast.message" :time="toast.time" />
     </v-app>
   </div>
 </template>
@@ -117,9 +92,23 @@ export default {
   name: 'App',
   data() {
     return {
+      login: true,
       route: 'Aluno',
       modalProjetos: false,
       projectsList: [],
+      usuario: {
+        name: '',
+        email: '',
+        senha: '',
+        empresa: '',
+        cpf: ''
+      },
+      rules: {
+        name: [v => !!v || 'Nome é obrigatório'],
+        email: [v => !!v || 'Email é obrigatório'],
+        senha: [v => !!v || 'Senha é obrigatória']
+      },
+      chipvalue: '1',
       cadastro: true,
       user: {
         name: 'Lucas Barcelos',
@@ -151,8 +140,8 @@ export default {
     }
   },
   computed: {
-    teste() {
-      return 'http://localhost:8080/./images/2019-05-24.jpg'
+    ViewComponent() {
+      return this.routes[this.currentRoute] || 'NotFound'
     },
     showToast: {
       get: function() {
@@ -167,7 +156,6 @@ export default {
   methods: {
     goHome() {
       this.$router.push(Home)
-      this.avatar = 'unnamed.jpg'
     },
     async buscarProjetos() {
       this.setLoading('Buscando')
@@ -186,6 +174,30 @@ export default {
     toggleCadastro() {
       this.cadastro = !this.cadastro
     },
+    cadastrar() {
+      if (this.$refs.formCadastro.validate()) {
+        switch (this.chipvalue) {
+          case '1':
+            this.cadastroEmpresario()
+            break
+          case '2':
+            this.cadastroCadi()
+            break
+          case '3':
+            this.cadastroAluno()
+            break
+          case '4':
+            this.cadastroProfessor()
+            break
+        }
+      }
+    },
+    cadastroEmpresario() {},
+    cadastroCadi() {},
+    cadastroAluno() {
+      alert('vai filhão')
+    },
+    cadastroProfessor() {},
     toggleModalProjects() {
       this.modalProjetos = !this.modalProjetos
     },
