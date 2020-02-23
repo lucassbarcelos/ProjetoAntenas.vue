@@ -1,68 +1,132 @@
 <template>
-  <v-app :style="bcg">
-    <v-card height="8%">
-      <v-app-bar absolute color="#6A76AB" dark src="https://picsum.photos/1920/1080?random">
-        <template v-slot:img="{ props }">
-          <v-img v-bind="props" gradient="to top right, rgba(100,115,201,.7), rgba(25,32,72,.7)"></v-img>
-        </template>
+  <div class="back ma-12 pa-12">
+    <v-app id="inspire">
+      <template>
+        <v-navigation-drawer permanent expand-on-hover color="white" absolute>
+          <v-list>
+            <v-list-item class="mx-2">
+              <v-list-item-avatar>
+                <v-img :src="require(`./images/${avatar}`)"></v-img>
+              </v-list-item-avatar>
+            </v-list-item>
 
-        <v-app-bar-nav-icon></v-app-bar-nav-icon>
+            <v-list-item link>
+              <v-list-item-content>
+                <v-list-item-title class="title">{{ user.name }}</v-list-item-title>
+                <v-list-item-subtitle>{{ user.email }}</v-list-item-subtitle>
+              </v-list-item-content>
+            </v-list-item>
+          </v-list>
 
-        <v-toolbar-title>Projeto Antenas</v-toolbar-title>
+          <v-divider></v-divider>
 
-        <v-spacer></v-spacer>
+          <v-list nav dense>
+            <v-list-item link>
+              <v-list-item-icon>
+                <v-icon>mdi-folder</v-icon>
+              </v-list-item-icon>
+              <v-list-item-title @click="goHome()">Meus Projetos</v-list-item-title>
+            </v-list-item>
+            <v-list-item link>
+              <v-list-item-icon>
+                <v-icon>mdi-account-multiple</v-icon>
+              </v-list-item-icon>
+              <v-list-item-title>Meu Perfil</v-list-item-title>
+            </v-list-item>
+            <v-list-item link>
+              <v-list-item-icon>
+                <v-icon>add</v-icon>
+              </v-list-item-icon>
+              <v-list-item-title>Novo Projeto</v-list-item-title>
+            </v-list-item>
+          </v-list>
+        </v-navigation-drawer>
+      </template>
+      <v-card v-if="cadastro" class="mx-auto my-12" width="450px">
+        <v-card-title class="center font-xxl">Projeto Antenas</v-card-title>
+        <v-divider class="py-2"></v-divider>
+        <v-card-subtitle>Cadastro</v-card-subtitle>
+        <v-row align="center" class="mx-0 px-5">
+          <v-text-field label="Nome" class="mr-2" outlined></v-text-field>
+        </v-row>
+        <v-row align="center" class="mx-0 px-5">
+          <v-text-field label="Email" class="mr-2" outlined></v-text-field>
+        </v-row>
+        <v-row align="center" class="mx-0 px-5">
+          <v-text-field label="Empresa/Cargo" outlined></v-text-field>
+        </v-row>
+        <v-row align="center" class="mx-0 px-5">
+          <v-text-field label="Cpf" outlined></v-text-field>
+        </v-row>
+        <v-row align="center" class="mx-0 px-5">
+          <v-text-field label="Senha" class="mr-2" outlined></v-text-field>
+        </v-row>
 
-        <v-btn icon @click="buscarProjetos()">
-          <v-icon>assignment</v-icon>
-        </v-btn>
+        <v-card-text>
+          <v-chip-group active-class="primary white--text" column>
+            <v-chip>Empresario</v-chip>
 
-        <v-btn icon>
-          <v-icon>mdi-heart</v-icon>
-        </v-btn>
-        <v-btn icon>
-          <v-icon>mdi-dots-vertical</v-icon>
-        </v-btn>
-      </v-app-bar>
-    </v-card>
+            <v-chip>Cadi</v-chip>
 
-    <v-dialog v-model="modalProjetos" width="900px">
-      <v-card>
-        <v-card-title>
-          <h1 class="font-xl font-weight-regular title-primary--text">Projetos</h1>
-        </v-card-title>
+            <v-chip>Aluno</v-chip>
 
-        <v-divider class="mb-4"></v-divider>
-        <v-data-table :headers="headersCritica" :items="projectsList" class="elevation-1" pagination.sync="pagination">
-        </v-data-table>
+            <v-chip>Professor</v-chip>
+          </v-chip-group>
+        </v-card-text>
+
         <v-card-actions>
+          <v-btn class="mb-2" color="primary">Cadastrar</v-btn>
           <v-spacer></v-spacer>
-
-          <v-btn color="primary" outlined @click="toggleModalProjects">Fechar</v-btn>
+          <v-btn class="mb-2" @click="toggleCadastro" color="primary" outlined>Login</v-btn>
         </v-card-actions>
       </v-card>
-    </v-dialog>
-    <v-content class="my-6 mx-7">
-      <router-view></router-view>
-    </v-content>
+      <v-card v-if="!cadastro" class="mx-auto my-12" width="450px">
+        <v-card-title class="center font-xxl">Projeto Antenas</v-card-title>
+        <v-divider class="py-2"></v-divider>
+        <v-card-subtitle>Login</v-card-subtitle>
 
-    <s-loading v-if="loading.show" :show="loading.show" :message="loading.message" />
-    <s-toast v-model="showToast" :color="toast.color" :message="toast.message" :time="toast.time" />
-  </v-app>
+        <v-row align="center" class="mx-0 px-5">
+          <v-text-field label="Email" class="mr-2" outlined></v-text-field>
+        </v-row>
+        <v-row align="center" class="mx-0 px-5">
+          <v-text-field label="Senha" class="mr-2" outlined></v-text-field>
+        </v-row>
+
+        <v-card-actions>
+          <v-btn class="mb-2" color="primary">Entrar</v-btn>
+          <v-spacer></v-spacer>
+          <v-btn class="mb-2" @click="toggleCadastro" color="primary" outlined>Cadastre-se</v-btn>
+        </v-card-actions>
+      </v-card>
+      <s-loading v-if="loading.show" :show="loading.show" :message="loading.message" />
+      <s-toast
+        v-model="showToast"
+        :color="toast.color"
+        :message="toast.message"
+        :time="toast.time"
+      />
+    </v-app>
+  </div>
 </template>
 
 <script>
 import { mapGetters, mapActions } from 'vuex'
 import { alunoService } from './services'
-
+import Home from './views/Home.vue'
 export default {
   name: 'App',
   data() {
     return {
-      bcg: { backgroundColor: localStorage.getItem('corFundo') },
       route: 'Aluno',
       modalProjetos: false,
       projectsList: [],
-      headersCritica: [
+      cadastro: true,
+      user: {
+        name: 'Lucas Barcelos',
+        email: 'lucasbarcelos58@gmail.com'
+      },
+      avatar: '2019-05-24.jpg',
+      headersProjetos: [
         {
           text: 'Projeto',
           value: 'titulo',
@@ -87,6 +151,9 @@ export default {
     }
   },
   computed: {
+    teste() {
+      return 'http://localhost:8080/./images/2019-05-24.jpg'
+    },
     showToast: {
       get: function() {
         return this.toast.show
@@ -98,6 +165,10 @@ export default {
     ...mapGetters(['loading', 'toast'])
   },
   methods: {
+    goHome() {
+      this.$router.push(Home)
+      this.avatar = 'unnamed.jpg'
+    },
     async buscarProjetos() {
       this.setLoading('Buscando')
       try {
@@ -111,6 +182,9 @@ export default {
         this.resetLoading()
         this.toggleModalProjects()
       }
+    },
+    toggleCadastro() {
+      this.cadastro = !this.cadastro
     },
     toggleModalProjects() {
       this.modalProjetos = !this.modalProjetos
@@ -184,5 +258,12 @@ export default {
 
 .v-form {
   width: 100%;
+}
+.back {
+  background-image: url(https://images.unsplash.com/photo-1522071820081-009f0129c71c?ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80);
+  background-size: cover;
+}
+#inspire {
+  background: none;
 }
 </style>

@@ -1,20 +1,22 @@
 <template>
-  <div>
-    <v-row>
-      <h1 class="font-xxl font-weight-medium title-primary--text">Aluno</h1>
-    </v-row>
+  <div class="bg">
+    <v-app class="inspire">
+      <span></span>
+    </v-app>
   </div>
 </template>
 
 <script>
 import { mapActions } from 'vuex'
-import { comboService, alunoService } from '../services'
-import { isNumber } from '../utils/number'
+// import { comboService, alunoService } from '../services'
+// import { isNumber } from '../utils/number'
 
 export default {
   name: 'Home',
   data() {
-    return {}
+    return {
+      teste: false
+    }
   },
   computed: {},
   async mounted() {},
@@ -23,3 +25,20 @@ export default {
   }
 }
 </script>
+<style>
+.bg {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: url('https://cdn.pixabay.com/photo/2016/03/26/13/09/organic-1280537_1280.jpg') no-repeat center center;
+  background-size: cover;
+  background-color: red;
+  transform: scale(1.1);
+}
+
+#inspire {
+  background: none;
+}
+</style>
