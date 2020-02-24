@@ -62,30 +62,39 @@
         </v-form>
       </v-card>
       <v-card v-if="!cadastro && login" class="mx-auto my-12" width="450px">
-        <v-card-title class="center font-xxl">Projeto Antenas</v-card-title>
-        <v-divider class="py-2"></v-divider>
-        <v-card-subtitle>Login</v-card-subtitle>
+        <v-form ref="formLogin" lazy-validation>
+          <v-card-title class="center font-xxl">Projeto Antenas</v-card-title>
+          <v-divider class="py-2"></v-divider>
+          <v-card-subtitle>Login</v-card-subtitle>
 
-        <v-row align="center" class="mx-0 px-5">
-          <v-text-field v-model="usuario.email" label="Email" class="mr-2" outlined></v-text-field>
-        </v-row>
-        <v-row align="center" class="mx-0 px-5">
-          <v-text-field
-            v-model="usuario.senha"
-            :append-icon="show2 ? 'mdi-eye' : 'mdi-eye-off'"
-            :type="show2 ? 'text' : 'password'"
-            label="Senha"
-            class="mr-2"
-            outlined
-            @click:append="show2 = !show2"
-          ></v-text-field>
-        </v-row>
+          <v-row align="center" class="mx-0 px-5">
+            <v-text-field
+              v-model="usuario.email"
+              :rules="rules.email"
+              label="Email"
+              class="mr-2"
+              outlined
+            ></v-text-field>
+          </v-row>
+          <v-row align="center" class="mx-0 px-5">
+            <v-text-field
+              v-model="usuario.senha"
+              :append-icon="show2 ? 'mdi-eye' : 'mdi-eye-off'"
+              :type="show2 ? 'text' : 'password'"
+              label="Senha"
+              class="mr-2"
+              :rules="rules.senha"
+              outlined
+              @click:append="show2 = !show2"
+            ></v-text-field>
+          </v-row>
 
-        <v-card-actions>
-          <v-btn class="mb-2" color="primary" @click="entrar()">Entrar</v-btn>
-          <v-spacer></v-spacer>
-          <v-btn class="mb-2" color="primary" outlined @click="toggleCadastro">Cadastre-se</v-btn>
-        </v-card-actions>
+          <v-card-actions>
+            <v-btn class="mb-2" color="primary" @keyup.enter="entrar()" @click="entrar()">Entrar</v-btn>
+            <v-spacer></v-spacer>
+            <v-btn class="mb-2" color="primary" outlined @click="toggleCadastro">Cadastre-se</v-btn>
+          </v-card-actions>
+        </v-form>
       </v-card>
       <router-view></router-view>
       <s-loading v-if="loading.show" :show="loading.show" :message="loading.message" />
@@ -235,11 +244,23 @@ export default {
       }
     },
     async entrar() {
-      const token = await alunoService.entrar({ email: this.usuario.email, senha: this.usuario.senha })
-      localStorage.setItem('token', token)
-      this.activeUser = await alunoService.validar({ token: token, email: this.usuario.email })
-      this.setUsuarioLogado(this.activeUser)
-      this.goHome()
+      this.setLoading('Entrando')
+      try {
+        if (this.$refs.formLogin.validate()) {
+          const token = await alunoService.entrar({ email: this.usuario.email, senha: this.usuario.senha })
+          localStorage.setItem('token', token)
+          this.activeUser = await alunoService.validar({ token: token, email: this.usuario.email })
+          this.setUsuarioLogado(this.activeUser)
+          this.goHome()
+        }
+      } catch (error) {
+        this.setToast({
+          color: 'error',
+          message: error.response.data.Message
+        })
+      } finally {
+        this.resetLoading()
+      }
     },
     cadastroProfessor() {},
     toggleModalProjects() {
