@@ -8,7 +8,15 @@ export default {
     return result.data
   },
   cadastrar: async payload => {
-    const { data } = await HTTPClient.post('/TabelaTarifaOvaDesovaDepot', payload)
+    const { data } = await HTTPClient.post('/aluno-cadastro', payload)
+    return data
+  },
+  entrar: async payload => {
+    const { data } = await HTTPClient.post('/aluno', payload)
+    return data
+  },
+  validar: async payload => {
+    const { data } = await HTTPClient.post('/validaAluno', payload)
     return data
   },
   getProjects: async () => {

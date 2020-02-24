@@ -1,5 +1,5 @@
 <template>
-  <div class="bg ml-9 mt-5 pl-6 pt-6">
+  <div class="bg ml-9 mt-5 pl-6 pt-5">
     <v-app class="inspire">
       <template>
         <v-navigation-drawer permanent expand-on-hover color="white" absolute>
@@ -25,7 +25,7 @@
               <v-list-item-icon>
                 <v-icon>mdi-folder</v-icon>
               </v-list-item-icon>
-              <v-list-item-title @click="goHome()">Meus Projetos</v-list-item-title>
+              <v-list-item-title>Meus Projetos</v-list-item-title>
             </v-list-item>
             <v-list-item link>
               <v-list-item-icon>
@@ -39,10 +39,16 @@
               </v-list-item-icon>
               <v-list-item-title>Adicionar Projeto</v-list-item-title>
             </v-list-item>
+            <v-list-item link>
+              <v-list-item-icon>
+                <v-icon>reply</v-icon>
+              </v-list-item-icon>
+              <v-list-item-title @click="$router.push('/')">Voltar</v-list-item-title>
+            </v-list-item>
           </v-list>
         </v-navigation-drawer>
       </template>
-      <v-card class="mx-auto" width="87%" height="90%" color="rgb(53, 54, 58)" dark>
+      <v-card class="mx-auto" width="46%" height="90%" color="rgb(53, 54, 58)" dark>
         <v-card-title class="center font-xxl">
           <v-avatar size="200" width="210" class="mt-2"> <img :src="require(`../images/${avatar}`)" /> </v-avatar
         ></v-card-title>
@@ -77,7 +83,7 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
 import { alunoService } from '../services'
 // import { isNumber } from '../utils/number'
 
@@ -90,6 +96,13 @@ export default {
       modalProjetos: false,
       projectsList: [],
       cadastro: true,
+      activeUser: {
+        id: {},
+        email: '',
+        senha: '',
+        name: '',
+        ativo: false
+      },
       user: {
         name: 'Lucas Barcelos',
         email: 'lucasbarcelos58@gmail.com',
@@ -133,8 +146,15 @@ export default {
       ]
     }
   },
-  computed: {},
-  async mounted() {},
+  computed: {
+    User() {
+      return this.usuarioLogado
+    },
+    ...mapGetters(['loading', 'toast', 'usuarioLogado'])
+  },
+  async mounted() {
+    this.activeUser = this.User
+  },
   methods: {
     async buscarProjetos() {
       this.setLoading('Buscando')

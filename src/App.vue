@@ -33,15 +33,17 @@
             <v-text-field
               v-model="usuario.senha"
               :rules="rules.name"
-              type="password"
               label="Senha"
+              :append-icon="show1 ? 'mdi-eye' : 'mdi-eye-off'"
+              :type="show1 ? 'text' : 'password'"
               class="mr-2"
               outlined
+              @click:append="show1 = !show1"
             ></v-text-field>
           </v-row>
 
           <v-card-text>
-            <v-chip-group v-model="chipvalue" active-class="primary white--text" column>
+            <v-chip-group v-model="chipvalue" :rules="rules.chips" active-class="primary white--text" column>
               <v-chip value="1">Empresario</v-chip>
 
               <v-chip value="2">Cadi</v-chip>
@@ -65,14 +67,22 @@
         <v-card-subtitle>Login</v-card-subtitle>
 
         <v-row align="center" class="mx-0 px-5">
-          <v-text-field label="Email" class="mr-2" outlined></v-text-field>
+          <v-text-field v-model="usuario.email" label="Email" class="mr-2" outlined></v-text-field>
         </v-row>
         <v-row align="center" class="mx-0 px-5">
-          <v-text-field label="Senha" class="mr-2" outlined></v-text-field>
+          <v-text-field
+            v-model="usuario.senha"
+            :append-icon="show2 ? 'mdi-eye' : 'mdi-eye-off'"
+            :type="show2 ? 'text' : 'password'"
+            label="Senha"
+            class="mr-2"
+            outlined
+            @click:append="show2 = !show2"
+          ></v-text-field>
         </v-row>
 
         <v-card-actions>
-          <v-btn class="mb-2" color="primary" @click="goHome()">Entrar</v-btn>
+          <v-btn class="mb-2" color="primary" @click="entrar()">Entrar</v-btn>
           <v-spacer></v-spacer>
           <v-btn class="mb-2" color="primary" outlined @click="toggleCadastro">Cadastre-se</v-btn>
         </v-card-actions>
@@ -94,7 +104,8 @@ export default {
     return {
       login: true,
       route: 'Aluno',
-      modalProjetos: false,
+      show2: false,
+      show1: false,
       projectsList: [],
       usuario: {
         name: '',
@@ -106,13 +117,21 @@ export default {
       rules: {
         name: [v => !!v || 'Nome é obrigatório'],
         email: [v => !!v || 'Email é obrigatório'],
-        senha: [v => !!v || 'Senha é obrigatória']
+        senha: [v => !!v || 'Senha é obrigatória'],
+        chips: [v => !!v || 'seleção é obrigatória']
       },
       chipvalue: '1',
       cadastro: true,
       user: {
         name: 'Lucas Barcelos',
         email: 'lucasbarcelos58@gmail.com'
+      },
+      activeUser: {
+        id: {},
+        email: '',
+        senha: '',
+        name: '',
+        ativo: false
       },
       avatar: '2019-05-24.jpg',
       headersProjetos: [
@@ -194,14 +213,39 @@ export default {
     },
     cadastroEmpresario() {},
     cadastroCadi() {},
-    cadastroAluno() {
-      alert('vai filhão')
+    async cadastroAluno() {
+      this.setLoading('Gravando')
+      try {
+        let data = await alunoService.cadastrar({
+          name: this.usuario.name,
+          email: this.usuario.email,
+          senha: this.usuario.senha
+        })
+        this.setToast({
+          color: 'succes',
+          message: data.Messsage
+        })
+      } catch (error) {
+        this.setToast({
+          color: 'error',
+          message: error.response.data.Message
+        })
+      } finally {
+        this.resetLoading()
+      }
+    },
+    async entrar() {
+      const token = await alunoService.entrar({ email: this.usuario.email, senha: this.usuario.senha })
+      localStorage.setItem('token', token)
+      this.activeUser = await alunoService.validar({ token: token, email: this.usuario.email })
+      this.setUsuarioLogado(this.activeUser)
+      this.goHome()
     },
     cadastroProfessor() {},
     toggleModalProjects() {
       this.modalProjetos = !this.modalProjetos
     },
-    ...mapActions(['setToast', 'setLoading', 'resetLoading'])
+    ...mapActions(['setToast', 'setLoading', 'resetLoading', 'setUsuarioLogado'])
   }
 }
 </script>
