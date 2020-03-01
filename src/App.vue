@@ -77,6 +77,17 @@
             ></v-text-field>
           </v-row>
           <v-row align="center" class="mx-0 px-5">
+            <v-select
+              v-model="tipoUsuario"
+              label="Tipo de Usuario"
+              :items="tiposUsuario"
+              item-text="tipo"
+              item-value="id"
+              class="mr-2"
+              outlined
+            ></v-select>
+          </v-row>
+          <v-row align="center" class="mx-0 px-5">
             <v-text-field
               v-model="usuario.senha"
               :append-icon="show2 ? 'mdi-eye' : 'mdi-eye-off'"
@@ -105,8 +116,12 @@
 
 <script>
 import { mapGetters, mapActions } from 'vuex'
-import { alunoService } from './services'
-import Home from './views/Home.vue'
+import { alunoService, empresarioService, cadiService, professorService } from './services'
+import Aluno from './views/Aluno.vue'
+import Empresario from './views/Empresario.vue'
+import Professor from './views/Professor.vue'
+import Cadi from './views/Cadi.vue'
+// import Empresario from './views/Empresario.vue'
 export default {
   name: 'App',
   data() {
@@ -115,6 +130,7 @@ export default {
       route: 'Aluno',
       show2: false,
       show1: false,
+      tipoUsuario: 0,
       projectsList: [],
       usuario: {
         name: '',
@@ -123,6 +139,12 @@ export default {
         empresa: '',
         cpf: ''
       },
+      tiposUsuario: [
+        { id: 1, tipo: 'Empresario' },
+        { id: 2, tipo: 'Cadi' },
+        { id: 3, tipo: 'Aluno' },
+        { id: 4, tipo: 'Professor' }
+      ],
       rules: {
         name: [v => !!v || 'Nome é obrigatório'],
         email: [v => !!v || 'Email é obrigatório'],
@@ -182,8 +204,17 @@ export default {
     ...mapGetters(['loading', 'toast'])
   },
   methods: {
-    goHome() {
-      this.$router.push(Home)
+    goAluno() {
+      this.$router.push(Aluno)
+    },
+    goEmpresario() {
+      this.$router.push(Empresario)
+    },
+    goProfessor() {
+      this.$router.push(Professor)
+    },
+    goCadi() {
+      this.$router.push(Cadi)
     },
     async buscarProjetos() {
       this.setLoading('Buscando')
@@ -244,15 +275,82 @@ export default {
       }
     },
     async entrar() {
+      if (this.$refs.formLogin.validate()) {
+        switch (this.tipoUsuario) {
+          case 1:
+            this.loginEmpresario()
+            break
+          case 2:
+            this.loginCadi()
+            break
+          case 3:
+            this.loginAluno()
+            break
+          case 4:
+            this.loginProfessor()
+            break
+        }
+      }
+    },
+    async loginAluno() {
       this.setLoading('Entrando')
       try {
-        if (this.$refs.formLogin.validate()) {
-          const token = await alunoService.entrar({ email: this.usuario.email, senha: this.usuario.senha })
-          localStorage.setItem('token', token)
-          this.activeUser = await alunoService.validar({ token: token, email: this.usuario.email })
-          this.setUsuarioLogado(this.activeUser)
-          this.goHome()
-        }
+        const token = await alunoService.entrar({ email: this.usuario.email, senha: this.usuario.senha })
+        localStorage.setItem('token', token)
+        this.activeUser = await alunoService.validar({ token: token, email: this.usuario.email })
+        this.setUsuarioLogado(this.activeUser)
+        this.goAluno()
+      } catch (error) {
+        this.setToast({
+          color: 'error',
+          message: error.response.data.Message
+        })
+      } finally {
+        this.resetLoading()
+      }
+    },
+    async loginEmpresario() {
+      this.setLoading('Entrando')
+      try {
+        this.activeUser = await empresarioService.entrar({ email: this.usuario.email, senha: this.usuario.senha })
+        const token = await empresarioService.gerarToken(this.activeUser)
+        localStorage.setItem('token', token)
+        this.setUsuarioLogado(this.activeUser)
+        this.goEmpresario()
+      } catch (error) {
+        this.setToast({
+          color: 'error',
+          message: error.response.data.Message
+        })
+      } finally {
+        this.resetLoading()
+      }
+    },
+    async loginCadi() {
+      this.setLoading('Entrando')
+      try {
+        this.activeUser = await cadiService.loginCadi({ email: this.usuario.email, senha: this.usuario.senha })
+        const token = await cadiService.gerarToken(this.activeUser)
+        localStorage.setItem('token', token)
+        this.setUsuarioLogado(this.activeUser)
+        this.goCadi()
+      } catch (error) {
+        this.setToast({
+          color: 'error',
+          message: error
+        })
+      } finally {
+        this.resetLoading()
+      }
+    },
+    async loginProfessor() {
+      this.setLoading('Entrando')
+      try {
+        const token = await alunoService.entrar({ email: this.usuario.email, senha: this.usuario.senha })
+        localStorage.setItem('token', token)
+        this.activeUser = await alunoService.validar({ token: token, email: this.usuario.email })
+        this.setUsuarioLogado(this.activeUser)
+        this.goAluno()
       } catch (error) {
         this.setToast({
           color: 'error',

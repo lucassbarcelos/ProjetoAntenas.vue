@@ -9,16 +9,16 @@
                 class="pt-10"
                 width="17%"
                 permanent
-                color="#303032"
+                color="blue-grey darken-3"
                 absolute
                 dark
                 :mini-variant="barExpand"
               >
                 <v-list>
                   <v-list-item class=" center">
-                    <v-list-item-avatar class="center" color="#486A98" size="70px">
-                      <h1 v-if="!activeUser.email">LB</h1>
-                      <v-img v-if="activeUser.email" :src="require(`../images/${avatar}`)"></v-img>
+                    <v-list-item-avatar class="center" color="red darken-1" size="70px">
+                      <h1 v-if="activeUser.email">{{ avatarName }}</h1>
+                      <v-img v-if="!activeUser.email" :src="require(`../images/${avatar}`)"></v-img>
                     </v-list-item-avatar>
                   </v-list-item>
 
@@ -33,7 +33,7 @@
                 <v-divider></v-divider>
 
                 <v-list nav dense>
-                  <v-list-item link>
+                  <v-list-item link @click="buscarProjetos()">
                     <v-list-item-icon>
                       <v-icon>mdi-folder</v-icon>
                     </v-list-item-icon>
@@ -70,9 +70,9 @@
               <v-card class="mx-auto" color="white">
                 <v-row>
                   <v-col cols="3" class="pl-5 mt-12">
-                    <v-avatar size="200" width="210" color="#486A98" class="mt-2 ml-2">
-                      <img v-if="activeUser.email" :src="require(`../images/${avatar}`)" />
-                      <span v-if="!activeUser.email" class="white--text headline">LB</span>
+                    <v-avatar size="200" width="210" color="red darken-1" class="mt-2 ml-2">
+                      <img v-if="!activeUser.email" :src="require(`../images/${avatar}`)" />
+                      <span v-if="activeUser.email" class="white--text headline">{{ avatarName }}</span>
                     </v-avatar>
                     <v-divider class="mt-2"></v-divider>
                     <v-card-subtitle class="center">Painel de medalhas</v-card-subtitle>
@@ -93,7 +93,7 @@
                       </v-badge>
                     </v-card-text>
                   </v-col>
-                  <v-divider class="mx-4" :inset="inset" vertical></v-divider>
+                  <v-divider class="mx-4" vertical></v-divider>
                   <v-col class="pt-5 mt-5">
                     <v-card-title class="left font-xxl">Meu Perfil</v-card-title>
                     <v-divider class="py-2"></v-divider>
@@ -110,6 +110,7 @@
                 <v-row>
                   <v-col>
                     <v-card-text class="font-xxl">Projetos</v-card-text>
+                    <v-data-table :headers="headersProjetos" :items="projectsList" hide-default-footer> </v-data-table>
                   </v-col>
                 </v-row>
               </v-card>
@@ -117,7 +118,22 @@
           </v-row>
         </v-col>
       </v-row>
-      <v-dialog v-model="modalNovoProjeto"> </v-dialog>
+      <v-dialog v-model="modalNovoProjeto" width="300px">
+        <v-card>
+          <v-card-title>
+            <h1 class="font-xl font-weight-regular title-primary--text">Adicionar Projeto</h1>
+          </v-card-title>
+
+          <v-divider class="mb-4 "></v-divider>
+          <v-text-field class="mx-2" label="Codigo do Projeto" outlined></v-text-field>
+          <v-card-actions>
+            <v-btn color="primary" @click="toggleAdd">Adicionar</v-btn>
+            <v-spacer></v-spacer>
+
+            <v-btn id="btnFecharDialog" color="primary" outlined @click="toggleAdd">Fechar</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
     </v-app>
   </div>
 </template>
@@ -128,7 +144,7 @@ import { alunoService } from '../services'
 // import { isNumber } from '../utils/number'
 
 export default {
-  name: 'Home',
+  name: 'Aluno',
   data() {
     return {
       login: true,
@@ -195,8 +211,9 @@ export default {
     ...mapGetters(['loading', 'toast', 'usuarioLogado'])
   },
   async mounted() {
-    this.activeUser = this.User
-    this.avatar = this.activeUser.email + '.png'
+    this.activeUser = this.usuarioLogado
+    this.montaAvatar()
+    // this.avatar = this.activeUser.email + '.png'
   },
   methods: {
     voltar() {
@@ -211,7 +228,7 @@ export default {
     async buscarProjetos() {
       this.setLoading('Buscando')
       try {
-        this.projectsList = await alunoService.getProjects()
+        this.projectsList = await alunoService.getAlunoProject(this.activeUser.email)
       } catch (error) {
         this.setToast({
           color: 'error',
@@ -219,7 +236,6 @@ export default {
         })
       } finally {
         this.resetLoading()
-        this.toggleModalProjects()
       }
     },
     toggleCadastro() {
@@ -227,6 +243,13 @@ export default {
     },
     toggleAdd() {
       this.modalNovoProjeto = !this.modalNovoProjeto
+    },
+    montaAvatar() {
+      let teste = this.activeUser.name.split(' ')
+      this.avatarName = teste[0].substring(0, 1).toUpperCase()
+      if (teste.length > 0) {
+        this.avatarName += teste[1].substring(0, 1).toUpperCase()
+      }
     },
     ...mapActions(['setToast', 'setLoading', 'resetLoading'])
   }
