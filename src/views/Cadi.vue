@@ -155,32 +155,38 @@
           </v-card-actions>
         </v-card>
       </v-dialog>
-      <v-dialog v-model="modalProjeto" width="300px">
+      <v-dialog v-model="modalProjeto" width="500px">
         <v-card>
           <v-card-title>
-            <h1 class="font-xl font-weight-regular title-primary--text">{{ currentProject.titulo }}</h1>
+            <h1 class="font-xl font-weight-regular title-primary--text">Atribuir projeto</h1>
           </v-card-title>
 
           <v-divider class="mb-4 "></v-divider>
-          <v-text-field v-model="projeto.titulo" class="mx-2" label="Titulo" readonly outlined></v-text-field>
-          <v-text-field
-            v-model="projeto.descricaoBreve"
-            class="mx-2"
+          <v-text-field v-model="currentProject.titulo" class="mx-5" label="Titulo" readonly outlined></v-text-field>
+          <v-textarea
+            v-model="currentProject.descricaoBreve"
+            class="mx-5"
             label="Descrição"
             readonly
             outlined
-          ></v-text-field>
+          ></v-textarea>
           <v-text-field
-            v-model="projeto.responsavelEmpresario"
-            class="mx-2"
+            v-model="currentProject.responsavelEmpresario"
+            class="mx-5"
             label="Empresário"
             readonly
             outlined
           ></v-text-field>
-          <v-text-field v-model="projeto.empresa" class="mx-2" label="Empresa" readonly outlined></v-text-field>
-          <v-text-field v-model="projeto.linkExterno1" class="mx-2" label="Contato" readonly outlined></v-text-field>
+          <v-text-field v-model="currentProject.empresa" class="mx-5" label="Empresa" readonly outlined></v-text-field>
+          <v-text-field
+            v-model="currentProject.linkExterno1"
+            class="mx-5"
+            label="Contato"
+            readonly
+            outlined
+          ></v-text-field>
           <v-card-actions>
-            <v-btn color="primary" @click="toggleAdd">Alterar</v-btn>
+            <v-btn color="primary" @click="AtribuirProjeto">Atribuir a mim</v-btn>
             <v-spacer></v-spacer>
 
             <v-btn id="btnFecharDialog" color="primary" outlined @click="toggleModalProjetos">Fechar</v-btn>
@@ -322,7 +328,21 @@ export default {
         })
       } finally {
         this.resetLoading()
-        this.buscarProjetos()
+      }
+    },
+    async AtribuirProjeto() {
+      this.setLoading('Atribuindo')
+      try {
+        await cadiService.setAtribuirProjeto(this.currentProject)
+      } catch (error) {
+        this.setToast({
+          color: 'error',
+          message: error.response.data.Message
+        })
+      } finally {
+        this.resetLoading()
+        this.buscarProjetosSemDono()
+        this.buscarMeusProjetos()
       }
     },
     toggleCadastro() {

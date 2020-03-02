@@ -27,6 +27,17 @@
             ></v-text-field>
           </v-row>
           <v-row align="center" class="mx-0 px-5">
+            <v-select
+              v-if="chipvalue == '2'"
+              v-model="usuario.nivel"
+              :items="cargos"
+              item-text="desc"
+              item-value="id"
+              label="Cargo"
+              outlined
+            ></v-select>
+          </v-row>
+          <v-row align="center" class="mx-0 px-5">
             <v-text-field v-if="chipvalue == '1'" v-model="usuario.cpf" label="Cpf" outlined></v-text-field>
           </v-row>
           <v-row align="center" class="mx-0 px-5">
@@ -83,6 +94,7 @@
               :items="tiposUsuario"
               item-text="tipo"
               item-value="id"
+              :rules="rules.cargo"
               class="mr-2"
               outlined
             ></v-select>
@@ -137,6 +149,7 @@ export default {
         email: '',
         senha: '',
         empresa: '',
+        nivel: 0,
         cpf: ''
       },
       tiposUsuario: [
@@ -145,11 +158,17 @@ export default {
         { id: 3, tipo: 'Aluno' },
         { id: 4, tipo: 'Professor' }
       ],
+      cargos: [
+        { id: 1, desc: 'Professor' },
+        { id: 2, desc: 'Coordenador' },
+        { id: 3, desc: 'Diretor' }
+      ],
       rules: {
         name: [v => !!v || 'Nome é obrigatório'],
         email: [v => !!v || 'Email é obrigatório'],
         senha: [v => !!v || 'Senha é obrigatória'],
-        chips: [v => !!v || 'seleção é obrigatória']
+        chips: [v => !!v || 'seleção é obrigatória'],
+        cargo: [v => !!v || 'seleção é obrigatória']
       },
       chipvalue: '1',
       cadastro: true,
@@ -252,7 +271,29 @@ export default {
       }
     },
     cadastroEmpresario() {},
-    cadastroCadi() {},
+    async cadastroCadi() {
+      this.setLoading('Gravando')
+      try {
+        await cadiService.cadastrar({
+          name: this.usuario.name,
+          email: this.usuario.email,
+          senha: this.usuario.senha,
+          nivel: this.usuario.nivel
+        })
+        this.setToast({
+          color: 'succes',
+          message: 'Usuario cadastrado, verifique seu email.'
+        })
+      } catch (error) {
+        this.setToast({
+          color: 'error',
+          message: error.response.data.Message
+        })
+      } finally {
+        this.resetLoading()
+        this.toggleCadastro()
+      }
+    },
     async cadastroAluno() {
       this.setLoading('Gravando')
       try {
@@ -272,6 +313,7 @@ export default {
         })
       } finally {
         this.resetLoading()
+        this.toggleCadastro()
       }
     },
     async entrar() {

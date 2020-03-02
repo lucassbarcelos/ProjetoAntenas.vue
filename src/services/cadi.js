@@ -1,6 +1,10 @@
 import { HTTPClient } from '../utils/request'
 
 export default {
+  cadastrar: async payload => {
+    const { data } = await HTTPClient.post('/cadicadastro', payload)
+    return data
+  },
   validar: async payload => {
     const { data } = await HTTPClient.post('/is-auth', payload)
     return data
@@ -19,6 +23,10 @@ export default {
   },
   getSemDono: async () => {
     const { data } = await HTTPClient.get('/semdono')
+    return data
+  },
+  setAtribuirProjeto: async payload => {
+    const { data } = await HTTPClient.post('/updateCadi', payload)
     return data
   }
 }
