@@ -2,7 +2,9 @@
   <div class="back ma-12 pa-12">
     <v-app id="inspire">
       <v-card v-if="cadastro && login" class="mx-auto my-12" width="450px">
-        <v-card-title class="center font-xxl">Projeto Antenas</v-card-title>
+        <!-- <v-card-title class="center font-xxl">Projeto Antenas</v-card-title> -->
+        <v-img class="center" :src="require('./images/1.png')" />
+
         <v-divider class="py-2"></v-divider>
         <v-card-subtitle>Cadastro</v-card-subtitle>
         <v-form ref="formCadastro" lazy-validation>
@@ -74,7 +76,8 @@
       </v-card>
       <v-card v-if="!cadastro && login" class="mx-auto my-12" width="450px">
         <v-form ref="formLogin" lazy-validation>
-          <v-card-title class="center font-xxl">Projeto Antenas</v-card-title>
+          <!-- <v-card-title class="center font-xxl">Projeto Antenas</v-card-title> -->
+          <v-img class="center" :src="require('./images/1.png')" />
           <v-divider class="py-2"></v-divider>
           <v-card-subtitle>Login</v-card-subtitle>
 

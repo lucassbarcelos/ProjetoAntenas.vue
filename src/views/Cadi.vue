@@ -94,7 +94,7 @@
                           :items="meusProjetos"
                           pagination.sync="pagination"
                           hide-default-footer
-                          @click:row="toggleModalProjetos"
+                          @click:row="atribuirProfessor"
                         >
                         </v-data-table>
                       </v-tab-item>
@@ -117,10 +117,10 @@
           </v-row>
         </v-col>
       </v-row>
-      <v-dialog v-model="modalNovoProjeto" width="500px">
+      <v-dialog v-model="modalAtribuirProjeto" width="500px">
         <v-card>
           <v-card-title class="font-xl font-weight-regular title-primary--text">
-            Adicionar novo projeto
+            Atribuir Professor
           </v-card-title>
 
           <v-divider class="mb-4 "></v-divider>
@@ -216,6 +216,7 @@ export default {
       cadastro: true,
       meusProjetos: [],
       modalProjeto: false,
+      modalAtribuirProjeto: false,
       currentProject: {},
       projeto: {
         titulo: '',
@@ -297,8 +298,22 @@ export default {
     iconExpand() {
       return this.barExpand ? 'keyboard_arrow_right' : 'keyboard_arrow_left'
     },
+    atribuirProfessor() {
+      try {
+      } catch (error) {
+        this.setToast({
+          color: 'error',
+          message: error
+        })
+      } finally {
+        this.toggleAtribuirProfessor()
+      }
+    },
     toggleExpand() {
       this.barExpand = !this.barExpand
+    },
+    toggleAtribuirProfessor() {
+      this.modalAtribuirProjeto = !this.modalAtribuirProjeto
     },
     toggleModalProjetos(value) {
       this.currentProject = value
@@ -333,7 +348,7 @@ export default {
     async AtribuirProjeto() {
       this.setLoading('Atribuindo')
       try {
-        await cadiService.setAtribuirProjeto(this.currentProject)
+        await cadiService.setAtribuirProjeto(this.activeUser.email)
       } catch (error) {
         this.setToast({
           color: 'error',

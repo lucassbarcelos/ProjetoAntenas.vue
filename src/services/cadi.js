@@ -25,8 +25,8 @@ export default {
     const { data } = await HTTPClient.get('/semdono')
     return data
   },
-  setAtribuirProjeto: async payload => {
-    const { data } = await HTTPClient.post('/updateCadi', payload)
+  setAtribuirProjeto: async email => {
+    const { data } = await HTTPClient.get('/dono?' + email)
     return data
   }
 }
