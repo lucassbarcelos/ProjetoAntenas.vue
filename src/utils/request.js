@@ -1,6 +1,5 @@
 import axios from 'axios'
 import { DEFAULT_API_URLS } from './enum'
-import { getStorage } from './localStorage'
 
 const { stringify, parse } = JSON
 export const parseNetworkError = error => parse(stringify(error))
@@ -10,9 +9,7 @@ const withBaseURLContext = () =>
 
 const HTTPClient = axios.create({
   baseURL: withBaseURLContext(),
-  headers: {
-    token:'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJhdXRoMCIsImVtYWlsIjoibGV0aWNpYS5jYXJ2YWxobzExQGZhdGVjLnNwLmdvdi5iciJ9.OnO-zs1y3Gx9CQTeUNF2lfYitgKvKp9xnTzgTFJBrvI'
-  }
+  headers: {}
 })
 
 // HTTPClient.interceptors.request.use(
