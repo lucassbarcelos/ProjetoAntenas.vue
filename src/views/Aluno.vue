@@ -239,6 +239,7 @@ export default {
       }
     },
     toggleCadastro() {
+      console.log('teste toggle cadastro')
       this.cadastro = !this.cadastro
     },
     toggleAdd() {
