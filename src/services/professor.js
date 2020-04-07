@@ -7,12 +7,20 @@ export default {
     })
     return result.data
   },
-  cadastrar: async payload => {
-    const { data } = await HTTPClient.post('/aluno-cadastro', payload)
+  entrar: async payload => {
+    const { data } = await HTTPClient.post('/professor', payload)
     return data
   },
-  entrar: async payload => {
-    const { data } = await HTTPClient.post('/aluno', payload)
+  gerarToken: async payload => {
+    const { data } = await HTTPClient.post('/GerarToken', payload)
+    return data
+  },
+  cadastrar: async payload => {
+    const { data } = await HTTPClient.post('/ProfessorCadastro', payload)
+    return data
+  },
+  updateProjetc: async payload => {
+    const { data } = await HTTPClient.post('/pulafase', payload)
     return data
   }
 }

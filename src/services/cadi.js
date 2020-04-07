@@ -25,8 +25,12 @@ export default {
     const { data } = await HTTPClient.get('/semdono')
     return data
   },
-  setAtribuirProjeto: async email => {
-    const { data } = await HTTPClient.get('/dono?' + email)
+  setAtualizarProjeto: async payload => {
+    const { data } = await HTTPClient.post('/atribuirCadi', payload)
+    return data
+  },
+  getAllProfessor: async () => {
+    const { data } = await HTTPClient.get('/listarProf')
     return data
   }
 }
