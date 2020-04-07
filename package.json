@@ -1,5 +1,5 @@
 {
-  "name": "statusmercante",
+  "name": "projetoantenas",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -16,14 +16,15 @@
     "register-service-worker": "^1.6.2",
     "vue": "2.6.11",
     "vue-router": "3.1.4",
+    "vue-the-mask": "0.11.1",
     "vuetify": "2.2.3",
     "vuex": "3.1.2"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "3.12.0",
-    "@vue/cli-plugin-eslint": "3.12.0",
+    "@vue/cli-plugin-eslint": "4.2.3",
     "@vue/cli-plugin-pwa": "4.2.3",
-    "@vue/cli-service": "3.12.0",
+    "@vue/cli-service": "4.2.3",
     "babel-eslint": "10.0.3",
     "eslint": "6.8.0",
     "eslint-config-prettier": "6.9.0",

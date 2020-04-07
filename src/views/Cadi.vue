@@ -94,7 +94,7 @@
                           :items="meusProjetos"
                           pagination.sync="pagination"
                           hide-default-footer
-                          @click:row="atribuirProfessor"
+                          @click:row="toogleModalAprov"
                         >
                         </v-data-table>
                       </v-tab-item>
@@ -124,31 +124,23 @@
           </v-card-title>
 
           <v-divider class="mb-4 "></v-divider>
-          <v-form ref="formNewProject" lazy-validation>
-            <v-text-field
-              v-model="projeto.titulo"
-              :rules="rules.titulo"
-              class="mx-5"
-              label="Titulo do projeto"
-              outlined
-            ></v-text-field>
-            <v-text-field
-              v-model="projeto.descricaoBreve"
-              :rules="rules.descricao"
-              class="mx-5"
-              label="Descrição breve"
-              outlined
-            ></v-text-field>
-            <v-text-field
-              v-model="projeto.linkExterno1"
-              :rules="rules.linkExterno"
-              class="mx-5"
-              label="Link externo"
-              outlined
-            ></v-text-field>
-          </v-form>
+          <v-text-field
+            v-model="projeto.titulo"
+            readonly
+            class="mx-5"
+            label="Titulo do projeto"
+            outlined
+          ></v-text-field>
+          <v-textarea
+            v-model="projeto.descricaoBreve"
+            class="mx-5"
+            label="Descrição breve"
+            outlined
+            readonly
+          ></v-textarea>
           <v-card-actions>
-            <v-btn color="primary" @click="adicionarNovoProjeto()">Adicionar</v-btn>
+            <v-btn color="primary" @click="aceitarProjeto()">Aceitar</v-btn>
+            <v-btn class="ml-2" color="primary" outlined @click="adicionarNovoProjeto()">Recusar </v-btn>
             <v-spacer></v-spacer>
 
             <v-btn id="btnFecharDialog" color="primary" outlined @click="toggleAdd">Fechar</v-btn>
@@ -185,6 +177,29 @@
             readonly
             outlined
           ></v-text-field>
+          <v-card-actions>
+            <v-btn color="primary" @click="AtribuirProjeto">Atribuir a mim</v-btn>
+            <v-spacer></v-spacer>
+
+            <v-btn id="btnFecharDialog" color="primary" outlined @click="toggleModalProjetos">Fechar</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+      <v-dialog v-model="modalProjeto" width="500px">
+        <v-card>
+          <v-card-title>
+            <h1 class="font-xl font-weight-regular title-primary--text">Lista de Professores</h1>
+          </v-card-title>
+
+          <v-divider class="mb-4 "></v-divider>
+          <v-select
+            v-model="currentProject.descricaoBreve"
+            class="mx-5"
+            :items="professores"
+            label="Descrição"
+            readonly
+            outlined
+          ></v-select>
           <v-card-actions>
             <v-btn color="primary" @click="AtribuirProjeto">Atribuir a mim</v-btn>
             <v-spacer></v-spacer>
@@ -254,6 +269,7 @@ export default {
         name: '',
         ativo: false
       },
+      professores: [],
       color: ['amber darken-1', 'deep-orange darken-4'],
       avatar: 'unnamed.jpg',
       headersProjetos: [
@@ -285,6 +301,7 @@ export default {
     if (!this.user.email) {
       this.voltar()
     }
+    this.professores = await cadiService.getAllProfessor()
     //this.buscarProjetos()
     this.activeUser = this.user
     this.montaAvatar()
@@ -298,8 +315,26 @@ export default {
     iconExpand() {
       return this.barExpand ? 'keyboard_arrow_right' : 'keyboard_arrow_left'
     },
-    atribuirProfessor() {
+    toogleModalAprov(value) {
+      this.projeto = value
+      this.modalAtribuirProjeto = true
+    },
+    async aceitarProjeto() {
+      this.projeto.status.negado = false
       try {
+        await cadiService.setAtualizarProjeto(this.projecto)
+      } catch (error) {
+        this.setToast({
+          color: 'error',
+          message: error.response.data
+        })
+      }
+    },
+    async atribuirProfessor() {
+      this.projecto.fase = 2
+      this.projeto.responsavelProfessor = this.professorSelected.email
+      try {
+        await cadiService.setAtualizarProjeto(this.projeto)
       } catch (error) {
         this.setToast({
           color: 'error',

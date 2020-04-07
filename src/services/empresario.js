@@ -26,5 +26,9 @@ export default {
   getEmpresarioProject: async email => {
     const { data } = await HTTPClient.get('/buscaprojetoporempresario?' + email)
     return data
+  },
+  cadastrar: async payload => {
+    const { data } = await HTTPClient.post('/cadastroempresario', payload)
+    return data
   }
 }

@@ -40,7 +40,13 @@
             ></v-select>
           </v-row>
           <v-row align="center" class="mx-0 px-5">
-            <v-text-field v-if="chipvalue == '1'" v-model="usuario.cpf" label="Cpf" outlined></v-text-field>
+            <v-text-field
+              v-if="chipvalue == '1'"
+              v-model="usuario.cpf"
+              v-mask="'###.###.###-##'"
+              label="Cpf"
+              outlined
+            ></v-text-field>
           </v-row>
           <v-row align="center" class="mx-0 px-5">
             <v-text-field
@@ -86,6 +92,7 @@
               v-model="usuario.email"
               :rules="rules.email"
               label="Email"
+              type="text"
               class="mr-2"
               outlined
             ></v-text-field>
@@ -168,7 +175,6 @@ export default {
       ],
       rules: {
         name: [v => !!v || 'Nome é obrigatório'],
-        email: [v => !!v || 'Email é obrigatório'],
         senha: [v => !!v || 'Senha é obrigatória'],
         chips: [v => !!v || 'seleção é obrigatória'],
         cargo: [v => !!v || 'seleção é obrigatória']
@@ -223,6 +229,9 @@ export default {
         this.setToast({ show: value, message: '', color: 'success', time: 3000 })
       }
     },
+    cpf(value) {
+      return value.mask('999.999.99-99')
+    },
     ...mapGetters(['loading', 'toast'])
   },
   methods: {
@@ -273,7 +282,31 @@ export default {
         }
       }
     },
-    cadastroEmpresario() {},
+    async cadastroEmpresario() {
+      this.setLoading('Gravando')
+      try {
+        await empresarioService.cadastrar({
+          name: this.usuario.name,
+          email: this.usuario.email,
+          senha: this.usuario.senha,
+          empreas: this.usuario.empresa,
+          cpf: this.usuario.cpf,
+          ativo: false
+        })
+        this.setToast({
+          color: 'succes',
+          message: 'Usuario cadastrado, verifique seu email.'
+        })
+      } catch (error) {
+        this.setToast({
+          color: 'error',
+          message: error.response.data.Message
+        })
+      } finally {
+        this.resetLoading()
+        this.toggleCadastro()
+      }
+    },
     async cadastroCadi() {
       this.setLoading('Gravando')
       try {
@@ -281,7 +314,8 @@ export default {
           name: this.usuario.name,
           email: this.usuario.email,
           senha: this.usuario.senha,
-          nivel: this.usuario.nivel
+          nivel: this.usuario.nivel,
+          ativo: false
         })
         this.setToast({
           color: 'succes',
@@ -303,11 +337,36 @@ export default {
         let data = await alunoService.cadastrar({
           name: this.usuario.name,
           email: this.usuario.email,
-          senha: this.usuario.senha
+          senha: this.usuario.senha,
+          ativo: false
         })
         this.setToast({
           color: 'succes',
           message: data.Messsage
+        })
+      } catch (error) {
+        this.setToast({
+          color: 'error',
+          message: error.response.data.Message
+        })
+      } finally {
+        this.resetLoading()
+        this.toggleCadastro()
+      }
+    },
+    async cadastroProfessor() {
+      this.setLoading('Gravando')
+      console.log(' entrou')
+      try {
+        await professorService.cadastrar({
+          name: this.usuario.name,
+          email: this.usuario.email,
+          senha: this.usuario.senha,
+          ativo: false
+        })
+        this.setToast({
+          color: 'succes',
+          message: 'Uma confirmação foi enviada para o seu email'
         })
       } catch (error) {
         this.setToast({
@@ -391,21 +450,20 @@ export default {
     async loginProfessor() {
       this.setLoading('Entrando')
       try {
-        const token = await alunoService.entrar({ email: this.usuario.email, senha: this.usuario.senha })
+        const token = await professorService.gerarToken({ email: this.usuario.email, senha: this.usuario.senha })
         localStorage.setItem('token', token)
-        this.activeUser = await alunoService.validar({ token: token, email: this.usuario.email })
+        this.activeUser = await professorService.entrar({ senha: this.usuario.senha, email: this.usuario.email })
         this.setUsuarioLogado(this.activeUser)
-        this.goAluno()
+        this.goProfessor()
       } catch (error) {
         this.setToast({
           color: 'error',
-          message: error.response.data.Message
+          message: error.response.data
         })
       } finally {
         this.resetLoading()
       }
     },
-    cadastroProfessor() {},
     toggleModalProjects() {
       this.modalProjetos = !this.modalProjetos
     },

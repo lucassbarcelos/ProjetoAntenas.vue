@@ -6,6 +6,7 @@ import SLoading from '@signainfo/sloading'
 import '@signainfo/sloading/dist/sloading.css'
 import SToast from '@signainfo/stoast'
 import '@signainfo/stoast/dist/stoast.css'
+import VueTheMask from 'vue-the-mask'
 import Vue from 'vue'
 import App from './App.vue'
 import vuetify from './plugins/vuetify'
@@ -15,6 +16,7 @@ import './registerServiceWorker'
 
 Vue.config.productionTip = false
 
+Vue.use(VueTheMask)
 Vue.use(SAutoComplete)
 Vue.use(SLoading)
 Vue.use(SToast)
